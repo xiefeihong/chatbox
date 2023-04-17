@@ -43,6 +43,7 @@ import {
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableItem } from './SortableItem';
+import {log} from "util";
 
 function Main() {
     const { t } = useTranslation()
@@ -266,6 +267,10 @@ function Main() {
             sessionListRef.current.scrollTo(0, 0)
         }
     }
+
+    // const proxy = 'http:127.0.0.1:7891'
+    const proxy = store.settings.proxyHost
+    if(proxy !== '') window.settings.setProxy(proxy)
 
     return (
         <Box sx={{ height: '100vh' }}>

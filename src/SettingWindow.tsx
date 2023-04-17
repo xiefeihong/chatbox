@@ -162,7 +162,15 @@ export default function SettingWindow(props: Props) {
                             value={settingsEdit.apiHost}
                             onChange={(e) => setSettingsEdit({ ...settingsEdit, apiHost: e.target.value.trim() })}
                         />
-
+                        <TextField
+                            margin="dense"
+                            label={t('proxy host')}
+                            type="text"
+                            fullWidth
+                            variant="outlined"
+                            value={settingsEdit.proxyHost}
+                            onChange={(e) => setSettingsEdit({ ...settingsEdit, proxyHost: e.target.value.trim() })}
+                        />
                         {
                             !settingsEdit.apiHost.match(/^(https?:\/\/)?api.openai.com(:\d+)?$/) && (
                                 <Alert severity="warning">

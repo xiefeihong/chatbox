@@ -19,6 +19,7 @@
   "proxy api host alert end": "協定。",
   "model": "模型",
   "api host": "API 域名",
+  "proxy host": "代理服務器: [http|socks5://host:port]",
   "token": "Token",
   "max tokens in context": "上下文中的 Token 上限",
   "max tokens per reply": "每則回覆的 Token 上限",

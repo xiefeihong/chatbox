@@ -34,6 +34,7 @@ export function createSession(modelName: string, name: string = "Untitled"): Ses
 export interface Settings {
     openaiKey: string
     apiHost: string
+    proxyHost: string
     model: string
     maxContextSize: string
     maxTokens: string

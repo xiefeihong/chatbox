@@ -18,6 +18,7 @@
   "or": "or",
   "proxy api host alert end": ".",
   "api host": "API Host",
+  "proxy host": "Proxy Host: [http|socks5://host:port]",
   "model": "Model",
   "token": "Token",
   "max tokens in context": "Max Tokens in Context",

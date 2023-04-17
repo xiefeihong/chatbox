@@ -13,6 +13,7 @@ export function getDefaultSettings(): Settings {
     return {
         openaiKey: '',
         apiHost: 'https://api.openai.com',
+        proxyHost: '',
         model: "gpt-3.5-turbo",
         maxContextSize: "4000",
         maxTokens: "2048",
