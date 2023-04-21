@@ -205,7 +205,7 @@ export default function SettingWindow(props: Props) {
                         <Typography>{t('model')} & {t('token')} </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <Alert severity="warning">
+                        {/*<Alert severity="warning">
                             {t('these settings are aimed at professional developers. if you do not understand the meaning of these settings, please do not modify them, as it may result in request errors.')}
                             {t('before making any modifications, please verify that your account has access to the selected models (some models require additional joining of the waiting list, regardless of your account type, otherwise, it will result in 404 errors).')}
                             {t('please make sure that the number of tokens does not exceed the limit for the selected model, otherwise, an error message will occur once the context exceeds the limit.')}
@@ -219,7 +219,7 @@ export default function SettingWindow(props: Props) {
                                 showModelName: getDefaultSettings().showModelName,
                             })}>{t('reset')}</Button>
                             {t('to default values.')}
-                        </Alert>
+                        </Alert>*/}
 
                         <FormControl fullWidth variant="outlined" margin="dense">
                             <InputLabel htmlFor="model-select">{t('model')}</InputLabel>

@@ -1,7 +1,9 @@
-import * as api from '@tauri-apps/api'
-import { Store } from "tauri-plugin-store-api";
+// import * as api from '@tauri-apps/api'
+// import { Data } from "tauri-plugin-store-api";
 
-const store = new Store('./config.json')
+import { Data } from './Data'
+
+const store = new Data()
 
 setInterval(async () => {
     try {
@@ -19,12 +21,12 @@ export const writeStore = async (key: string, value: any) => {
 }
 
 export const readStore = async (key: string): Promise<any | undefined> => {
-    await handleCompatibilityV0_1()
+    // await handleCompatibilityV0_1()
     const value = await store.get(key)
-    return value || undefined
+    return value
 }
 
-async function handleCompatibilityV0_1() {
+/*async function handleCompatibilityV0_1() {
     // 第一次启动时，将旧版本的配置文件迁移到新的配置文件中
     try {
         const handled = await store.get('hasHandleCompatibilityV0_1')
@@ -40,21 +42,25 @@ async function handleCompatibilityV0_1() {
     } catch (e) {
         console.log(e)
     }
-}
+}*/
 
 export const shouldUseDarkColors = async (): Promise<boolean> => {
-    const theme = await api.window.appWindow.theme()
-    return theme === 'dark'
+    // const theme = await api.window.appWindow.theme()
+    // return theme === 'dark'
+    return false
 }
 
 export async function onSystemThemeChange(callback: () => void) {
-    return api.window.appWindow.onThemeChanged(callback)
+    // return api.window.appWindow.onThemeChanged(callback)
+    return null
 }
 
 export const getVersion = async () => {
-    return api.app.getVersion()
+    // return api.app.getVersion()
+    return ''
 }
 
 export const openLink = async (url: string) => {
-    return api.shell.open(url)
+    // return api.shell.open(url)
+    return null
 }

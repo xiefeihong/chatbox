@@ -1,22 +1,29 @@
-const { app, BrowserWindow, Menu, ipcMain, session} = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require("path");
+require('update-electron-app')()
 
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 960,
+  const win = new BrowserWindow({
+    width: 1000,
+    height: 800,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegrationInWorker: true
     }
   });
 
-  // mainWindow.loadURL('http://127.0.0.1:3000')
-  mainWindow.loadFile('build/index.html');
-  Menu.setApplicationMenu(null)
-  mainWindow.webContents.openDevTools();
+  // win.loadURL('http://127.0.0.1:3000')
+  win.loadFile('build/index.html');
+  win.setMenu(null);
+  // win.webContents.openDevTools();
 };
 
-app.on('ready', createWindow);
+app.whenReady().then(() => {
+  createWindow()
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -24,15 +31,8 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
-});
-
 ipcMain.on('set-proxy', (event, proxy) => {
-  // const ses = mainWindow.webContents.session
-  const ses = session.defaultSession
-  ses.resolveProxy(proxy)
-  console.log('UserAgent: ', ses.getUserAgent())
+  const ses = event.sender.session
+  ses.setProxy({proxyRules: proxy})
+  console.log('main_proxy: ', proxy)
 })

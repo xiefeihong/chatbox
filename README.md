@@ -11,15 +11,15 @@
 
 
 <p align="center">
-<a href="https://github.com/Bin-Huang/chatbox/releases" target="_blank">
+<a href="https://github.com/xiefeihong/chatbox/releases" target="_blank">
 <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
 </a>
 
-<a href="https://github.com/Bin-Huang/chatbox/releases" target="_blank">
+<a href="https://github.com/xiefeihong/chatbox/releases" target="_blank">
 <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
 </a>
 
-<a href="https://github.com/Bin-Huang/chatbox/releases" target="_blank">
+<a href="https://github.com/xiefeihong/chatbox/releases" target="_blank">
 <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
 </a>
 
@@ -45,7 +45,7 @@
 
 **Download installers**:
 
-[>>Click here to view all available installers for download<<](https://github.com/Bin-Huang/chatbox/releases)
+[>>Click here to view all available installers for download<<](https://github.com/xiefeihong/chatbox/releases)
 
 **Supported Platforms**:
 
@@ -70,7 +70,7 @@ paru -S chatbox-bin
 ## Roadmap
 
 - [x] AI chat and session management
-- [x] Store all your important message data locally.
+- [x] Data all your important message data locally.
 - [x] Markdown
 - [x] Streaming reply
 - [x] API Host configuration

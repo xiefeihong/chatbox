@@ -1,5 +1,7 @@
 module.exports = {
-  packagerConfig: {},
+  packagerConfig: {
+    icon: 'public/icons/icon',
+  },
   rebuildConfig: {},
   makers: [
     {
@@ -16,7 +18,24 @@ module.exports = {
     },*/
     {
       name: '@electron-forge/maker-rpm',
-      config: {},
+      config: {
+        options: {
+          icon: 'public/icons/icon.png'
+        },
+      },
     },
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'github-user-name',
+          name: 'github-repo-name',
+        },
+        prerelease: false,
+        // draft: true,
+      },
+    },
+  ]
 };

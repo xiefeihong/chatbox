@@ -11,15 +11,15 @@
 
 
 <p align="center">
-<a href="https://github.com/Bin-Huang/chatbox/releases" target="_blank">
+<a href="https://github.com/xiefeihong/chatbox/releases" target="_blank">
 <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
 </a>
 
-<a href="https://github.com/Bin-Huang/chatbox/releases" target="_blank">
+<a href="https://github.com/xiefeihong/chatbox/releases" target="_blank">
 <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
 </a>
 
-<a href="https://github.com/Bin-Huang/chatbox/releases" target="_blank">
+<a href="https://github.com/xiefeihong/chatbox/releases" target="_blank">
 <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
 </a>
 
@@ -45,7 +45,7 @@
 
 **下载安装包**：
 
-[>>点击这里查看可供下载的安装包<<](https://github.com/Bin-Huang/chatbox/releases)
+[>>点击这里查看可供下载的安装包<<](https://github.com/xiefeihong/chatbox/releases)
 
 
 **支持系统**：

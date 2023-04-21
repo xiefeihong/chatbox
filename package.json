@@ -1,7 +1,7 @@
 {
-  "name": "chatbox",
-  "productName": "chatbox",
-  "version": "0.0.1",
+  "name": "ChatBox",
+  "productName": "ChatBox",
+  "version": "1.0.0",
   "private": true,
   "description": "a cross-platform desktop client for ChatGPT API (OpenAI API)",
   "main": "src/main.js",
@@ -11,16 +11,14 @@
     "build:react": "react-scripts build",
     "test:react": "react-scripts test",
     "eject:react": "react-scripts eject",
-    "dev:tauri": "tauri dev",
-    "build:tauri": "tauri build",
-    "tauri:tauri": "tauri",
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Bin-Huang/chatbox.git"
+    "url": "https://github.com/xiefeihong/chatbox.git"
   },
   "keywords": [],
   "author": {
@@ -34,7 +32,7 @@
     "@electron-forge/maker-rpm": "^6.1.1",
     "@electron-forge/maker-squirrel": "^6.1.1",
     "@electron-forge/maker-zip": "^6.1.1",
-    "@tauri-apps/cli": "^1.2.3",
+    "@electron-forge/publisher-github": "^6.1.1",
     "@types/highlight.js": "^10.1.0",
     "@types/markdown-it": "^12.2.3",
     "@types/markdown-it-link-attributes": "^3.0.1",
@@ -66,7 +64,6 @@
     "@emotion/styled": "^11.10.6",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.11",
-    "@tauri-apps/api": "^1.2.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -88,8 +85,8 @@
     "react-dom": "^18.2.0",
     "react-ga4": "^2.1.0",
     "react-i18next": "^12.2.0",
-    "tauri-plugin-store-api": "https://github.com/tauri-apps/tauri-plugin-store",
     "typescript": "^4.9.5",
+    "update-electron-app": "^2.0.1",
     "uuid": "^9.0.0",
     "web-vitals": "^2.1.4"
   },

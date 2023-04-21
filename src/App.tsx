@@ -387,7 +387,7 @@ function Main() {
                             </MenuItem>
 
                             <MenuItem onClick={() => {
-                                api.openLink('https://github.com/Bin-Huang/chatbox/releases')
+                                api.openLink('https://github.com/xiefeihong/chatbox/releases')
                             }}>
                                 <ListItemIcon>
                                     <IconButton>
