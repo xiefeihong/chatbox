@@ -1,246 +1,31 @@
-version: 2.1
+name: Build/release
 
-orbs:
-  node: circleci/node@5.1.0
-  win: circleci/windows@5.0.0
-
-commands:
-  install:
-    steps:
-      - run: git config --global core.autocrlf input
-      - node/install:
-          node-version: '18.4.0'
-      - run: nvm use 18.4.0
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
-            - v1-dependencies-{{ arch }}
-      - run: npm install --global yarn
-      - run: yarn install --frozen-lockfile
-      - run: yarn run contributors
-      - run: yarn run electron-releases
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
-  load-gh-token:
-    steps:
-      - run: |
-          curl -X POST "$FIDDLE_SECRETS_SERVICE_ENDPOINT?format=shell" -H "Content-Type: application/json" -d '{"token":"'$CIRCLE_OIDC_TOKEN'"}' >> $BASH_ENV
-  test:
-    steps:
-      - run:
-          command: yarn test:ci
-          environment:
-            JEST_JUNIT_OUTPUT_DIR: ./reports/
-      - store_test_results:
-          path: ./reports/
+on: push
 
 jobs:
-  lint:
-    docker:
-      - image: cimg/base:stable
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
     steps:
-      - install
-      - run: yarn run lint
-  mac-test:
-    parameters:
-      arch:
-        type: enum
-        enum: [ 'x64', 'arm64' ]
-    macos:
-      xcode: '13.4.0'
-    resource_class: macos.x86.medium.gen2
-    steps:
-      - install
-      - test
-  win-test:
-    parameters:
-      arch:
-        type: enum
-        enum: [ 'x64', 'arm64', 'ia32' ]
-    executor:
-      name: win/default
-      shell: bash.exe
-    steps:
-      - install
-      - test
-  linux-test:
-    parameters:
-      arch:
-        type: enum
-        enum: [ 'x64', 'arm64','armv7l' ]
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - install
-      - test
-  mac-build:
-    parameters:
-      arch:
-        type: enum
-        enum: [ 'x64', 'arm64' ]
-    macos:
-      xcode: '13.4.0'
-    resource_class: macos.x86.medium.gen2
-    steps:
-      - install
-      - run: chmod +x tools/add-macos-cert.sh && ./tools/add-macos-cert.sh
-      - run: npx yarn run publish --arch=<< parameters.arch >> --dry-run
-      - store_artifacts:
-          path: out
-      - persist_to_workspace:
-          root: .
-          paths:
-            - out
-  win-build:
-    parameters:
-      arch:
-        type: enum
-        enum: [ 'x64', 'arm64', 'ia32' ]
-    executor:
-      name: win/default
-      shell: bash.exe
-    steps:
-      - install
-      - run: export WINDOWS_CODESIGN_FILE=$(node ./tools/add-windows-cert.js)
-      - run: npx yarn run publish --arch=<< parameters.arch >> --dry-run
-      - store_artifacts:
-          path: out
-      - persist_to_workspace:
-          root: .
-          paths:
-            - out
-  linux-build:
-    parameters:
-      arch:
-        type: enum
-        enum: [ 'x64', 'arm64','armv7l' ]
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - run: sudo apt-get update && sudo apt install rpm
-      - install
-      - run: npx yarn run publish --arch=<< parameters.arch >> --dry-run
-      # CircleCI doesn't let you persist files with the same name from multiple
-      # jobs, so only persist the .webpack path from the x64 linux-build job
-      - when:
-          condition:
-            not:
-              equal: [ << parameters.arch >>, x64 ]
-          steps:
-            - run: rm -rf .webpack/*
-      - store_artifacts:
-          path: out
-      - persist_to_workspace:
-          root: .
-          paths:
-            - out
-            - .webpack
-  publish-to-github:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - install
-      - attach_workspace:
-          at: .
-      - load-gh-token
-      - run: yarn run publish --from-dry-run
-  notify-sentry-deploy:
-    docker:
-      - image: cimg/base:stable
-    environment:
-      SENTRY_ORG: electronjs
-      SENTRY_PROJECT: electron-fiddle
-      SENTRY_ENVIRONMENT: production
-    steps:
-      - install
-      - attach_workspace:
-          at: .
-      - run:
-          name: Create release and notify Sentry of deploy
-          command: |
-            curl -sL https://sentry.io/get-cli/ | bash
-            export SENTRY_RELEASE=Electron-Fiddle@${CIRCLE_TAG:1}
-            sentry-cli releases new -p $SENTRY_PROJECT $SENTRY_RELEASE
-            sentry-cli releases set-commits $SENTRY_RELEASE --auto
-            sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps ./.webpack
-            sentry-cli releases finalize $SENTRY_RELEASE
-            sentry-cli releases deploys $SENTRY_RELEASE new -e $SENTRY_ENVIRONMENT
-workflows:
-  build-and-test:
-    jobs:
-      - lint
-      - mac-test:
-          matrix:
-            parameters:
-              arch: [ x64, arm64 ]
-      - win-test:
-          matrix:
-            parameters:
-              arch: [ x64 ]
-      - linux-test:
-          matrix:
-            parameters:
-              arch: [ x64 ]
-      - mac-build:
-          matrix:
-            parameters:
-              arch: [ x64, arm64 ]
-          filters:
-            tags:
-              only:
-                - /^v.*/
-            branches:
-              ignore: /.*/
-      - win-build:
-          matrix:
-            parameters:
-              arch: [ x64, ia32 ]
-          filters:
-            tags:
-              only:
-                - /^v.*/
-            branches:
-              ignore: /.*/
-      - linux-build:
-          matrix:
-            parameters:
-              arch: [ x64, arm64, armv7l ]
-          filters:
-            tags:
-              only:
-                - /^v.*/
-            branches:
-              ignore: /.*/
-      - publish-to-github:
-          context: fiddle-release
-          requires:
-            - lint
-            - mac-test-x64
-            - mac-test-arm64
-            - win-test-x64
-            - linux-test-x64
-            - mac-build-x64
-            - mac-build-arm64
-            - win-build-ia32
-            - win-build-x64
-            - linux-build-x64
-            - linux-build-arm64
-            - linux-build-armv7l
-          filters:
-            tags:
-              only:
-                - /^v.*/
-            branches:
-              ignore: /.*/
-      - notify-sentry-deploy:
-          requires:
-            - publish-to-github
-          filters:
-            tags:
-              only:
-                - /^v.*/
-            branches:
-              ignore: /.*/
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.github_token }}
+
+          # If the commit is tagged with a version (e.g. "v1.0.0"),
+          # release the app after building
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
