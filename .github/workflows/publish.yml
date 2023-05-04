@@ -1,75 +1,246 @@
-name: 'publish'
-on:
-  push:
-    tags: [ v\d+\.\d+\.\d+ ]
+version: 2.1
+
+orbs:
+  node: circleci/node@5.1.0
+  win: circleci/windows@5.0.0
+
+commands:
+  install:
+    steps:
+      - run: git config --global core.autocrlf input
+      - node/install:
+          node-version: '18.4.0'
+      - run: nvm use 18.4.0
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
+            - v1-dependencies-{{ arch }}
+      - run: npm install --global yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn run contributors
+      - run: yarn run electron-releases
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
+  load-gh-token:
+    steps:
+      - run: |
+          curl -X POST "$FIDDLE_SECRETS_SERVICE_ENDPOINT?format=shell" -H "Content-Type: application/json" -d '{"token":"'$CIRCLE_OIDC_TOKEN'"}' >> $BASH_ENV
+  test:
+    steps:
+      - run:
+          command: yarn test:ci
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/
+      - store_test_results:
+          path: ./reports/
 
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest, ubuntu-20.04, windows-latest]
-
-    runs-on: ${{ matrix.platform }}
+  lint:
+    docker:
+      - image: cimg/base:stable
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Get version
-        id: get_version
-        uses: battila7/get-version-action@v2
-
-      - name: setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
-
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libx11-dev libxdo-dev libxcb-shape0-dev libxcb-xfixes0-dev
-      - name: install dependencies (mac only)
-        if: matrix.platform == 'macos-latest'
-        run: |
-          rustup target add aarch64-apple-darwin
-      - uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: install frontend dependencies
-        run: yarn install # change this to npm or pnpm depending on which one you use
-
-      - name: Change Version
-        env:
-          VERSION: "${{ steps.get_version.outputs.version-without-v }}"
-        run: make change-version
-
-      - name: Build Tauri App
-        uses: tauri-apps/tauri-action@dev
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
-          ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-        with:
-          tagName: Chatbox-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'Chatbox v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+      - install
+      - run: yarn run lint
+  mac-test:
+    parameters:
+      arch:
+        type: enum
+        enum: [ 'x64', 'arm64' ]
+    macos:
+      xcode: '13.4.0'
+    resource_class: macos.x86.medium.gen2
+    steps:
+      - install
+      - test
+  win-test:
+    parameters:
+      arch:
+        type: enum
+        enum: [ 'x64', 'arm64', 'ia32' ]
+    executor:
+      name: win/default
+      shell: bash.exe
+    steps:
+      - install
+      - test
+  linux-test:
+    parameters:
+      arch:
+        type: enum
+        enum: [ 'x64', 'arm64','armv7l' ]
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - install
+      - test
+  mac-build:
+    parameters:
+      arch:
+        type: enum
+        enum: [ 'x64', 'arm64' ]
+    macos:
+      xcode: '13.4.0'
+    resource_class: macos.x86.medium.gen2
+    steps:
+      - install
+      - run: chmod +x tools/add-macos-cert.sh && ./tools/add-macos-cert.sh
+      - run: npx yarn run publish --arch=<< parameters.arch >> --dry-run
+      - store_artifacts:
+          path: out
+      - persist_to_workspace:
+          root: .
+          paths:
+            - out
+  win-build:
+    parameters:
+      arch:
+        type: enum
+        enum: [ 'x64', 'arm64', 'ia32' ]
+    executor:
+      name: win/default
+      shell: bash.exe
+    steps:
+      - install
+      - run: export WINDOWS_CODESIGN_FILE=$(node ./tools/add-windows-cert.js)
+      - run: npx yarn run publish --arch=<< parameters.arch >> --dry-run
+      - store_artifacts:
+          path: out
+      - persist_to_workspace:
+          root: .
+          paths:
+            - out
+  linux-build:
+    parameters:
+      arch:
+        type: enum
+        enum: [ 'x64', 'arm64','armv7l' ]
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run: sudo apt-get update && sudo apt install rpm
+      - install
+      - run: npx yarn run publish --arch=<< parameters.arch >> --dry-run
+      # CircleCI doesn't let you persist files with the same name from multiple
+      # jobs, so only persist the .webpack path from the x64 linux-build job
+      - when:
+          condition:
+            not:
+              equal: [ << parameters.arch >>, x64 ]
+          steps:
+            - run: rm -rf .webpack/*
+      - store_artifacts:
+          path: out
+      - persist_to_workspace:
+          root: .
+          paths:
+            - out
+            - .webpack
+  publish-to-github:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - install
+      - attach_workspace:
+          at: .
+      - load-gh-token
+      - run: yarn run publish --from-dry-run
+  notify-sentry-deploy:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      SENTRY_ORG: electronjs
+      SENTRY_PROJECT: electron-fiddle
+      SENTRY_ENVIRONMENT: production
+    steps:
+      - install
+      - attach_workspace:
+          at: .
+      - run:
+          name: Create release and notify Sentry of deploy
+          command: |
+            curl -sL https://sentry.io/get-cli/ | bash
+            export SENTRY_RELEASE=Electron-Fiddle@${CIRCLE_TAG:1}
+            sentry-cli releases new -p $SENTRY_PROJECT $SENTRY_RELEASE
+            sentry-cli releases set-commits $SENTRY_RELEASE --auto
+            sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps ./.webpack
+            sentry-cli releases finalize $SENTRY_RELEASE
+            sentry-cli releases deploys $SENTRY_RELEASE new -e $SENTRY_ENVIRONMENT
+workflows:
+  build-and-test:
+    jobs:
+      - lint
+      - mac-test:
+          matrix:
+            parameters:
+              arch: [ x64, arm64 ]
+      - win-test:
+          matrix:
+            parameters:
+              arch: [ x64 ]
+      - linux-test:
+          matrix:
+            parameters:
+              arch: [ x64 ]
+      - mac-build:
+          matrix:
+            parameters:
+              arch: [ x64, arm64 ]
+          filters:
+            tags:
+              only:
+                - /^v.*/
+            branches:
+              ignore: /.*/
+      - win-build:
+          matrix:
+            parameters:
+              arch: [ x64, ia32 ]
+          filters:
+            tags:
+              only:
+                - /^v.*/
+            branches:
+              ignore: /.*/
+      - linux-build:
+          matrix:
+            parameters:
+              arch: [ x64, arm64, armv7l ]
+          filters:
+            tags:
+              only:
+                - /^v.*/
+            branches:
+              ignore: /.*/
+      - publish-to-github:
+          context: fiddle-release
+          requires:
+            - lint
+            - mac-test-x64
+            - mac-test-arm64
+            - win-test-x64
+            - linux-test-x64
+            - mac-build-x64
+            - mac-build-arm64
+            - win-build-ia32
+            - win-build-x64
+            - linux-build-x64
+            - linux-build-arm64
+            - linux-build-armv7l
+          filters:
+            tags:
+              only:
+                - /^v.*/
+            branches:
+              ignore: /.*/
+      - notify-sentry-deploy:
+          requires:
+            - publish-to-github
+          filters:
+            tags:
+              only:
+                - /^v.*/
+            branches:
+              ignore: /.*/

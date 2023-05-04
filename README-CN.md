@@ -114,19 +114,9 @@ paru -S chatbox-bin
 1. 在提交 issue 之前，请确保没有重复话题的 issue。
 2. 请确保标题足够的简洁明了，描述足够的详细。
 
-## 请熬夜的开发者喝瓶可乐？
-
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/benn)
-
-| Paypal | Wechat Pay | Ali Pay |
-| --- | --- | --- |
-| [**`Paypal`**](https://www.paypal.me/tobennhuang) | <img src="./doc/wechat_pay.JPG" height="240" /> | <img src="./doc/ali_pay.PNG" height="240" /> |
-
 ## Contact
 
-- [Twitter](https://twitter.com/benn_huang)
-- [Email](mailto:tohuangbin@gmail.com)
-- [Blog](https://bennhuang.com)
+- [Email](mailto:xiefeihong@foxmail.com)
 
 ## License
 
