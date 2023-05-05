@@ -1,12 +1,12 @@
 name: Publish Package to npmjs
 on:
-#  release:
-#    types: [published]
+  release:
+    types: [published]
 
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+#  push:
+#    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
 
 permissions:
   contents: read
