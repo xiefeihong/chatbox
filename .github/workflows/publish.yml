@@ -14,13 +14,20 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 18.x ]
+        os: [ ubuntu-latest, windows-latest ]
+
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       # Setup .npmrc.bak file to publish to npm
       - uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
 #          registry-url: 'https://registry.npmjs.org'
 #          # Defaults to the user or organization that owns the workflow file
 #          scope: '@octocat'
