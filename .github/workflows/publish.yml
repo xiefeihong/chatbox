@@ -1,7 +1,17 @@
 name: Publish Package to npmjs
 on:
-  release:
-    types: [published]
+#  release:
+#    types: [published]
+
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,8 +24,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           # Defaults to the user or organization that owns the workflow file
           scope: '@octocat'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - run: yarn
       - run: yarn build:react
-      - run: yarn publish
+      - run: yarn run publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
