@@ -34,7 +34,7 @@ module.exports = {
           name: 'chatbox',
         },
         prerelease: true,
-        draft: true,
+        draft: false,
       },
     },
   ]
