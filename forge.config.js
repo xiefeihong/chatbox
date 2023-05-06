@@ -30,11 +30,11 @@ module.exports = {
       name: '@electron-forge/publisher-github',
       config: {
         repository: {
-          owner: 'github-user-name',
-          name: 'github-repo-name',
+          owner: 'xiefeihong',
+          name: 'chatbox',
         },
-        prerelease: false,
-        draft: false,
+        prerelease: true,
+        draft: true,
       },
     },
   ]
