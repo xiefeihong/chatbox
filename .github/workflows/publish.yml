@@ -8,9 +8,10 @@ on:
 #  pull_request:
 #    branches: [ main ]
 
-permissions: write-all
-#permissions:
+#permissions: write-all
+permissions:
 #  contents: read
+  contents: write
 #  pull-requests: write
 
 jobs:
@@ -19,7 +20,7 @@ jobs:
     strategy:
       matrix:
         node-version: [ 18.x ]
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     runs-on: ${{ matrix.os }}
     steps:
