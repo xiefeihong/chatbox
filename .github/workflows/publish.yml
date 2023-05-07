@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         node-version: [ 18.x ]
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ fedora-latest, windows-latest, macos-latest ]
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -31,9 +31,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
 #          registry-url: 'https://registry.npmjs.org'
+          registry-url: 'https://registry.npm.taobao.org'
 #          # Defaults to the user or organization that owns the workflow file
 #          scope: '@octocat'
 #          repo-token: ${{ secrets.GITHUB_TOKEN }}
+        if: matrix.os == 'fedora-latest'
+        run: |
+          sudo dnf install dpkg -y
       - run: yarn
       - run: yarn build:react
       - run: yarn run publish
