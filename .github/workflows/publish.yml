@@ -1,10 +1,10 @@
 name: Publish Package to github
 on:
-  release:
-    types: [published]
+#  release:
+#    types: [published]
 
-#  push:
-#    branches: [ main ]
+  push:
+    branches: [ main ]
 
 #permissions: read-all|write-all
 permissions:
@@ -38,13 +38,10 @@ jobs:
       - if: matrix.platform == 'ubuntu-20.04'
         run: |
           sudo apt-get install rpm -y
-      - if: matrix.platform == 'macos-latest'
-        run: |
-          rustup target add aarch64-apple-darwin
-      - uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+#      - uses: actions/cache@v2
+#        with:
+#          path: '**/node_modules'
+#          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
       - run: yarn
       - run: yarn build:react
       - run: yarn run publish
