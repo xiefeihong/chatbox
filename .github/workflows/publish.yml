@@ -15,28 +15,36 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 18.x ]
-        os: [ ubuntu-20.04, windows-latest, macos-latest ]
         include:
           - target: aarch64-apple-darwin
-            os: macos-latest
+            platform: macos-latest
+          - target: x86_64-apple-darwin
+            platform: macos-latest
+          - target: x86_64-unknown-linux-gnu
+            platform: ubuntu-20.04
+          - target: x86_64-pc-windows-msvc
+            platform: windows-latest
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18
           cache: 'yarn'
-          if: matrix.os == 'windows-latest'
-          registry-url: 'https://registry.npm.taobao.org'
+#          if: matrix.platform == 'windows-latest'
+#          registry-url: 'https://registry.npm.taobao.org'
 #          registry-url: 'https://registry.npmjs.org'
-      - if: matrix.os == 'ubuntu-20.04'
+      - if: matrix.platform == 'ubuntu-20.04'
         run: |
           sudo apt-get install rpm -y
       - if: matrix.platform == 'macos-latest'
         run: |
           rustup target add aarch64-apple-darwin
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
       - run: yarn
       - run: yarn build:react
       - run: yarn run publish
