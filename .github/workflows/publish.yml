@@ -35,7 +35,7 @@ jobs:
 #          # Defaults to the user or organization that owns the workflow file
 #          scope: '@octocat'
 #          repo-token: ${{ secrets.GITHUB_TOKEN }}
-        if: matrix.os == 'fedora-latest'
+      - if: matrix.os == 'fedora-latest'
         run: |
           sudo dnf install dpkg -y
       - run: yarn
