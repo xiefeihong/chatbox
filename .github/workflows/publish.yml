@@ -42,6 +42,9 @@ jobs:
 #        with:
 #          path: '**/node_modules'
 #          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+      - if: matrix.platform == 'macos-latest'
+        run: |
+          uname -a
       - run: yarn
       - run: yarn build:react
       - run: yarn run publish
