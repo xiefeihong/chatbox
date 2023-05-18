@@ -61,10 +61,7 @@ export function ThemeSwitcherProvider(props: ThemeSwitcherProviderProps) {
         [mode]
     );
 
-    const theme = useMemo(() => createTheme(
-        fetchThemeDesign(realMode, settings.fontSize)),
-        [realMode, settings],
-    );
+    const theme = useMemo(() => createTheme(fetchThemeDesign(realMode)), [realMode]);
 
     useLayoutEffect(() => {
         if (mode !== ThemeMode.System) return;
@@ -77,7 +74,7 @@ export function ThemeSwitcherProvider(props: ThemeSwitcherProviderProps) {
         handleModeChange();
         const disposePromise =  api.onSystemThemeChange(handleModeChange);
         return () => {
-            disposePromise.then((dispose) => dispose());
+            // disposePromise.then((dispose) => dispose());
         }
     }, [mode]);
 

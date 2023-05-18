@@ -2,13 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import ReactGA from "react-ga4";
-import * as store from './store'
-import * as api from './api'
 import './i18n.js'
 
 import './styles/index.css'
 import './styles/index.scss'
+import './styles/App.css'
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -35,26 +33,3 @@ function disableMenu() {
     }, { capture: true })
 }
 disableMenu()
-
-// ga4
-;(async () => {
-    const GAID = "G-B365F44W6E"
-    try {
-        const conf = await store.readConfig()
-        const version = await api.getVersion()
-        ReactGA.initialize([{
-            trackingId: GAID,
-            gaOptions: {
-                app_version: version,
-                clientId: conf.uuid
-            },
-            gtagOptions: {
-                app_version: version,
-                clientId: conf.uuid
-            }
-        }])
-    } catch (e) {
-        ReactGA.initialize(GAID)
-        throw e
-    }
-})()

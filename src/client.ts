@@ -15,7 +15,6 @@ export async function replay(
     maxContextSize: string,
     maxTokens: string,
     modelName: string,
-    temperature: number,
     msgs: Message[],
     onText?: (option: OnTextCallbackResult) => void,
     onError?: (error: Error) => void,
@@ -68,8 +67,7 @@ export async function replay(
                 messages,
                 model: modelName,
                 max_tokens: maxTokensNumber,
-                temperature,
-                stream: true,
+                stream: true
             }),
             signal: controller.signal,
         });
