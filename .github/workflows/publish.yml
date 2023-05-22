@@ -43,7 +43,7 @@ jobs:
 #          path: '**/node_modules'
 #          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
       - if: matrix.target == 'aarch64-apple-darwin'
-        with:
+        env:
           npm_config_arch: arm64
       - run: yarn
       - run: yarn build:react
