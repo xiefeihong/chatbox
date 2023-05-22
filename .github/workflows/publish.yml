@@ -42,10 +42,9 @@ jobs:
 #        with:
 #          path: '**/node_modules'
 #          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+      - if: matrix.target == 'aarch64-apple-darwin'
+        run: export npm_config_arch=arm64
       - run: yarn
-        env:
-          - if: matrix.target == 'aarch64-apple-darwin'
-            npm_config_arch: arm64
       - run: yarn build:react
       - run: yarn run publish
         env:
