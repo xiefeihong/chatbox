@@ -50,3 +50,10 @@ jobs:
       - run: yarn run publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+#          tagName: Chatbox-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
+#          releaseName: 'Chatbox v__VERSION__'
+#          releaseBody: 'See the assets to download this version and install.'
+#          releaseDraft: true
+#          prerelease: false
+          args: --target ${{matrix.target}}
