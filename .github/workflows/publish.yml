@@ -42,18 +42,11 @@ jobs:
 #        with:
 #          path: '**/node_modules'
 #          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-      - if: matrix.platform == 'macos-latest'
-        run: |
-          uname -a
+      - if: matrix.target == 'aarch64-apple-darwin'
+        with:
+          npm_config_arch: arm64
       - run: yarn
       - run: yarn build:react
       - run: yarn run publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: --target ${{matrix.target}}
-#          tagName: Chatbox-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-#          releaseName: 'Chatbox v__VERSION__'
-#          releaseBody: 'See the assets to download this version and install.'
-#          releaseDraft: true
-#          prerelease: false
