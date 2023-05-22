@@ -15,17 +15,22 @@ jobs:
 
     strategy:
       matrix:
-        include:
-          - target: aarch64-apple-darwin
-            platform: macos-latest
-          - target: x86_64-apple-darwin
-            platform: macos-latest
-          - target: x86_64-unknown-linux-gnu
-            platform: ubuntu-20.04
-          - target: x86_64-pc-windows-msvc
-            platform: windows-latest
+        platform: [ubuntu-20.04, windows-latest, macos-latest]
+        arch: [x86_64, arm64]
+#        include:
+#          - target: aarch64-apple-darwin
+#            platform: macos-latest
+#          - target: x86_64-apple-darwin
+#            platform: macos-latest
+#          - target: x86_64-unknown-linux-gnu
+#            platform: ubuntu-20.04
+#          - target: x86_64-pc-windows-msvc
+#            platform: windows-latest
+
 
     runs-on: ${{ matrix.platform }}
+    env:
+      npm_config_arch: ${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -42,8 +47,8 @@ jobs:
 #        with:
 #          path: '**/node_modules'
 #          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-      - if: matrix.target == 'aarch64-apple-darwin'
-        run: export npm_config_arch=arm64
+#      - if: matrix.target == 'aarch64-apple-darwin'
+#        run: export npm_config_arch=arm64
       - run: yarn
       - run: yarn build:react
       - run: yarn run publish
