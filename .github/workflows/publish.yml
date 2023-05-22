@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-20.04, windows-latest, macos-latest]
-        arch: [x86_64, arm64]
+        arch: [x64, arm64]
 #        include:
 #          - target: aarch64-apple-darwin
 #            platform: macos-latest
