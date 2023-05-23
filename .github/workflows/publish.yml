@@ -15,8 +15,8 @@ jobs:
 
     strategy:
       matrix:
-        platform: [ubuntu-20.04, windows-latest, macos-latest]
-        arch: [x64, arm64]
+        platform: [ubuntu-20.04, windows-latest, macos-latest, macos-latest-xl]
+#        arch: [x64, arm64]
 #        include:
 #          - target: aarch64-apple-darwin
 #            platform: macos-latest
@@ -29,8 +29,8 @@ jobs:
 
 
     runs-on: ${{ matrix.platform }}
-    env:
-      npm_config_arch: ${{ matrix.arch }}
+#    env:
+#      npm_config_arch: ${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
